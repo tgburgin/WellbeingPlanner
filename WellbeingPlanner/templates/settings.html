@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+<body class="{{ 'dark-mode' if dark_mode else '' }}">
+    <div class="container mt-5">
+        <h1>Settings</h1>
+        <form class="{{ 'dark-mode' if dark_mode else '' }}" method="POST" action="{{ url_for('settings') }}">
+            <div class="mb-3">
+                <label for="fitness_test_choice" class="form-label">Default Fitness Test</label>
+                <select id="fitness_test_choice" name="fitness_test_choice" class="form-select">
+                    {% for test in fitness_tests %}
+                    <option value="{{ test.id }}" {% if test.id == fitness_test_choice %}selected{% endif %}>
+                        {{ test.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn btn-link">Back to Home</a>
+    </div>
+    <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+</body>
+</html>

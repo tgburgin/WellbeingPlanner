@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./WellbeingPlanner/calendar_functions"
+    ]
+}

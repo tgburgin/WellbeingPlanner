@@ -46,57 +46,51 @@ def add_daily_activities(calendar_service, calendar_id, start_date, end_date, da
                 calendar_service.events().insert(calendarId=calendar_id, body=event).execute()
     print("Added daily activities successfully!")
 
-def get_fitness_test_choice():
-    # Print options
-    print("Choose the fitness test to replace the first Monday of the month:")
-    print("1. 1-Mile Run")
-    print("2. 5K Run")
-    print("3. 10K Run")
-    print("4. None")    
-    
-    # Get user choice
-    choice = input("Enter the number corresponding to your choice: ")
+def get_fitness_test_choices():
+    # Return the fitness test choices as a list
+    return [
+        {"id": 1, "name": "1-Mile Run", "details": "Run or walk 1 mile as fast as you can."},
+        {"id": 2, "name": "5K Run", "details": "Run or walk 5 kilometers as fast as you can."},
+        {"id": 3, "name": "10K Run", "details": "Run or walk 10 kilometers as fast as you can."},
+        {"id": 4, "name": "None", "details": "No fitness test selected."}
+    ]
 
-    # Validate choice
-    if choice not in ["1", "2", "3", "4"]:
-        print("Invalid choice. Please enter a number between 1 and 4.")
-        # Recursively call the function until a valid choice is made
-        return get_fitness_test_choice()
+def process_fitness_test_choice(choice_id):
+    # Map choice ID to a fitness test
+    fitness_tests = {
+        1: {"name": "Baseline Cardio Fitness Test: 1-Mile Run", "time": "09:30", "duration": 20, "details": "Run or walk 1 mile as fast as you can."},
+        2: {"name": "Baseline Cardio Fitness Test: 5K Run", "time": "09:30", "duration": 30, "details": "Run or walk 5 kilometers as fast as you can."},
+        3: {"name": "Baseline Cardio Fitness Test: 10K Run", "time": "09:30", "duration": 60, "details": "Run or walk 10 kilometers as fast as you can."},
+        4: None  # No test selected
+    }
+    return fitness_tests.get(choice_id, None)
 
-    # Return choice
-    return int(choice)
-
-def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, weekly_activities, cardio_workouts):
-    # Add weekly activities for each week in the date range
-
+def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, weekly_activities, cardio_workouts, fitness_test_choice=None):
+    fitness_test_choice = fitness_test_choice or 1  # Default to 1-Mile Run if not set
     fitness_test = None
-    # If the date range covers the first Monday of the month, ask the user if they want to replace it with a fitness test
-    if start_date.day <= 7 and 7 <= end_date.day:
-        # Ask the user if they want to replace the first Monday of the month with a fitness test
-        fitness_test_choice = get_fitness_test_choice()
-        if fitness_test_choice == 1:
-            fitness_test = {
-                "name": "Baseline Cardio Fitness Test: 1-Mile Run",
-                "time": "09:30",
-                "duration": 20,
-                "details": "Run or walk 1 mile as fast as you can."
-            }
-        elif fitness_test_choice == 2:
-            fitness_test = {
-                "name": "Baseline Cardio Fitness Test: 5K Run",
-                "time": "09:30",
-                "duration": 30,
-                "details": "Run or walk 5 kilometers as fast as you can."
-            }
-        elif fitness_test_choice == 3:
-            fitness_test = {
-                "name": "Baseline Cardio Fitness Test: 10K Run",
-                "time": "09:30",
-                "duration": 60,
-                "details": "Run or walk 10 kilometers as fast as you can."
-            }
-        else:
-            fitness_test = None
+
+    # Map fitness test choice to its details
+    if fitness_test_choice == 1:
+        fitness_test = {
+            "name": "Baseline Cardio Fitness Test: 1-Mile Run",
+            "time": "09:30",
+            "duration": 20,
+            "details": "Run or walk 1 mile as fast as you can."
+        }
+    elif fitness_test_choice == 2:
+        fitness_test = {
+            "name": "Baseline Cardio Fitness Test: 5K Run",
+            "time": "09:30",
+            "duration": 30,
+            "details": "Run or walk 5 kilometers as fast as you can."
+        }
+    elif fitness_test_choice == 3:
+        fitness_test = {
+            "name": "Baseline Cardio Fitness Test: 10K Run",
+            "time": "09:30",
+            "duration": 60,
+            "details": "Run or walk 10 kilometers as fast as you can."
+        }
 
     first_monday_offset = (7 - start_date.weekday()) % 7
     first_monday = start_date + timedelta(days=first_monday_offset)
@@ -104,7 +98,7 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
     for activity in weekly_activities:
         event_date = start_date + timedelta(days=(activity['day'] - start_date.weekday()) % 7)
         while event_date <= end_date:
-            # Skip any events in the past
+            # Skip events in the past
             if event_date < datetime.now():
                 event_date += timedelta(weeks=1)
                 continue
@@ -120,7 +114,7 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
                 activity_name = activity['name']
                 activity_description = activity['details']
                 activity_duration = activity['duration']
-                    
+
             if event_date == first_monday and activity['day'] == 0 and fitness_test is not None:  # Monday's activity
                 # Add the fitness test event instead of the regular activity
                 event_time = datetime.combine(first_monday, datetime.strptime(fitness_test['time'], "%H:%M").time())
@@ -137,9 +131,7 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
                     },
                     'reminders': {
                         'useDefault': False,
-                        'overrides': [
-                            {'method': 'popup', 'minutes': 0}
-                        ]
+                        'overrides': [{'method': 'popup', 'minutes': 0}]
                     }
                 }
             else:
@@ -157,13 +149,10 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
                     },
                     'reminders': {
                         'useDefault': False,
-                        'overrides': [
-                            {'method': 'popup', 'minutes': 0}
-                        ]
+                        'overrides': [{'method': 'popup', 'minutes': 0}]
                     }
                 }
 
-            # Get the event end datetime
             event_end = datetime.fromisoformat(event['end']['dateTime'])
 
             # Add the event to the calendar if it's not in the past
@@ -171,8 +160,6 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
                 calendar_service.events().insert(calendarId=calendar_id, body=event).execute()
 
             event_date += timedelta(weeks=1)
-
-    print("Added weekly activities successfully!")
 
 def get_starting_weekday():
     # Print options

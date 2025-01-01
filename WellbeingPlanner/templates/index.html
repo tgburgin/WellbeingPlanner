@@ -6,199 +6,119 @@
     <title>Wellbeing Planner</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* General Styles */
-        body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .container {
-            margin-top: 5%;
-            max-width: 600px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #343a40;
-            transition: color 0.3s;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-    
-        /* Progress Messages */
-        .progress-messages {
-            margin-top: 20px;
-            padding: 10px;
-            height: 150px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
-        }
-    
-        /* Dark Mode Styles */
-        body.dark-mode {
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        .container.dark-mode {
-            background-color: #1e1e1e;
-            color: #e0e0e0;
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-        }
-        h1.dark-mode {
-            color: #90caf9; /* Lighter blue for better contrast */
-        }
-        .btn-primary.dark-mode {
-            background-color: #90caf9;
-            border-color: #90caf9;
-        }
-        .btn-primary.dark-mode:hover {
-            background-color: #42a5f5;
-        }
-    
-        /* Progress Messages - Dark Mode */
-        .progress-messages.dark-mode {
-            background-color: #333; /* Darker background for contrast */
-            border-color: #555; /* Subtle border */
-            color: #fff; /* Light text for readability */
-        }
-    </style>    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
-<body>
+<body class="{{ 'dark-mode' if dark_mode else '' }}">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1>Wellbeing Planner</h1>
-            <button id="darkModeToggle" class="btn btn-outline-secondary">🌙</button>
-        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Wellbeing Planner</h1>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('settings') }}" class="btn btn-outline-secondary btn-icon" data-bs-toggle="tooltip" title="Settings">
+                    <i class="bi-gear"></i>
+                </a>
+                <button id="darkModeToggle" class="btn btn-outline-secondary btn-icon" title="Toggle Dark Mode">🌙</button>
+            </div>
+        </div>        
         <div id="messageContainer" class="alert d-none" role="alert"></div>
-        <form id="wellbeingForm">
+        <form class="{{ 'dark-mode' if dark_mode else '' }}" id="wellbeingForm">
             <div class="mb-3">
                 <label for="start_date" class="form-label">Start Date</label>
-                <input type="date" id="start_date" name="start_date" class="form-control" required>
+                <input type="text" id="start_date" name="start_date" class="form-control" required>
             </div>
             <div class="mb-3">
                 <label for="end_date" class="form-label">End Date</label>
-                <input type="date" id="end_date" name="end_date" class="form-control" required>
+                <input type="text" id="end_date" name="end_date" class="form-control" required>
             </div>
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">Create Plan</button>
             </div>
         </form>
-
-        <div id="progressContainer" class="progress-messages d-none">
+        <div id="progressContainer" class="progress-messages d-none mt-4">
             <strong>Progress:</strong>
-            <ul id="progressList"></ul>
+            <ul id="progressList" class="mb-0"></ul>
         </div>
     </div>
-
+    <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
     <script>
-        const toggleButton = document.getElementById('darkModeToggle');
-        const body = document.body;
-        const container = document.querySelector('.container');
-        const primaryButton = document.querySelector('.btn-primary');
-        const heading = document.querySelector('h1');
-        const messageContainer = document.getElementById('messageContainer');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressList = document.getElementById('progressList');
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
+        
+            flatpickr('#start_date', {
+                dateFormat: 'Y-m-d',
+                theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+                minDate: today, // Prevent dates before today
+                onChange: (selectedDates) => {
+                    // Dynamically adjust the minDate for end_date
+                    const minEndDate = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : today;
+                    document.getElementById('end_date')._flatpickr.set('minDate', minEndDate);
+                },
+                onReady: (selectedDates, dateStr, instance) => {
+                    instance.input.classList.add('dark-input');
+                },
+            });
+        
+            flatpickr('#end_date', {
+                dateFormat: 'Y-m-d',
+                theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+                minDate: today, // Prevent dates before today
+                onReady: (selectedDates, dateStr, instance) => {
+                    instance.input.classList.add('dark-input');
+                },
+            });        
 
-        // Load initial mode from localStorage
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        if (isDarkMode) {
-            body.classList.add('dark-mode');
-            container.classList.add('dark-mode');
-            primaryButton.classList.add('dark-mode');
-            heading.classList.add('dark-mode');
-            toggleButton.textContent = "☀️";
-        }
+            initializeFlatpickr();
 
-        // Toggle dark mode
-        toggleButton.addEventListener('click', () => {
-            const darkModeEnabled = body.classList.toggle('dark-mode');
-            container.classList.toggle('dark-mode');
-            primaryButton.classList.toggle('dark-mode');
-            heading.classList.toggle('dark-mode');
-            progressContainer.classList.toggle('dark-mode'); // Apply dark mode styles to progress messages
+            // Toggle dark mode
+            toggleButton.addEventListener('click', () => {
+                const isDarkMode = body.classList.toggle('dark-mode');
+                toggleButton.textContent = isDarkMode ? "☀️" : "🌙";
 
-            // Update button text
-            toggleButton.textContent = darkModeEnabled ? "☀️" : "🌙";
-
-            // Save preference to localStorage
-            localStorage.setItem('darkMode', darkModeEnabled);
+                // Reinitialize Flatpickr with updated theme
+                setTimeout(initializeFlatpickr, 300); // Wait for dark mode transition
+            });
         });
-
-        // Disable past dates
-        function getTodayDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        const todayDate = getTodayDate();
-        const startDateInput = document.getElementById('start_date');
-        const endDateInput = document.getElementById('end_date');
-
-        startDateInput.setAttribute('min', todayDate);
-        endDateInput.setAttribute('min', todayDate);
-
-        // Adjust end_date based on start_date selection
-        startDateInput.addEventListener('change', () => {
-            const startDateValue = startDateInput.value;
-            endDateInput.setAttribute('min', startDateValue);
-
-            // If end_date is earlier than start_date, update it
-            if (endDateInput.value < startDateValue) {
-                endDateInput.value = startDateValue;
-            }
-        });
-
-        // Handle form submission with real-time progress
-        document.getElementById('wellbeingForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const startDate = startDateInput.value;
-            const endDate = endDateInput.value;
-
-            // Validate inputs
+    </script>
+    <script>
+        document.getElementById('wellbeingForm').addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent the default form submission behavior
+        
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+        
             if (!startDate || !endDate) {
                 alert("Please select valid start and end dates.");
                 return;
             }
-
-            // Show progress container
-            progressList.innerHTML = '';
+        
+            // Display progress container
+            const progressContainer = document.getElementById('progressContainer');
+            const progressList = document.getElementById('progressList');
             progressContainer.classList.remove('d-none');
-
-            // Create an EventSource connection
+            progressList.innerHTML = ''; // Clear previous progress
+        
+            // Open an EventSource connection to /progress
             const eventSource = new EventSource(`/progress?start_date=${startDate}&end_date=${endDate}`);
-
-            eventSource.onmessage = function (event) {
+        
+            // Handle incoming messages
+            eventSource.onmessage = (event) => {
                 const li = document.createElement('li');
                 li.textContent = event.data;
                 progressList.appendChild(li);
-                progressContainer.scrollTop = progressContainer.scrollHeight;
+                progressContainer.scrollTop = progressContainer.scrollHeight; // Scroll to the bottom
             };
-
-            eventSource.onerror = function () {
+        
+            // Handle errors
+            eventSource.onerror = () => {
                 eventSource.close();
+                const li = document.createElement('li');
+                li.textContent = "An error occurred. Please try again.";
+                progressList.appendChild(li);
             };
-        });
+        });        
     </script>
 </body>
 </html>
