@@ -1,6 +1,6 @@
 /* General Styles */
 body {
-    background-color: #f8f9fa;
+    background-color: #cccccd;
     font-family: Arial, sans-serif;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -30,24 +30,15 @@ h1 {
 .btn-outline-secondary {
     transition: background-color 0.3s, color 0.3s;
 }
-.progress-messages {
-    margin-top: 20px;
-    padding: 15px;
-    height: 150px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-}
 
 /* Ensure h1 and buttons are aligned */
 .d-flex.align-items-center {
-    align-items: center; /* Vertical alignment for all items */
+    align-items: center;
 }
 
 /* Flex container spacing */
 .d-flex.align-items-center.gap-2 {
-    gap: 0.5rem; /* Adjust spacing between buttons */
+    gap: 0.5rem;
 }
 
 /* Ensure buttons remain consistent */
@@ -65,13 +56,12 @@ h1 {
 
 .btn-icon:hover {
     background-color: rgba(0, 0, 0, 0.1);
-    transform: scale(1.1); /* Optional for hover effect */
+    transform: scale(1.1);
 }
 
 .btn-icon:active {
     transform: scale(0.95);
 }
-
 
 /* Dark Mode Styles */
 body.dark-mode {
@@ -90,10 +80,10 @@ body.dark-mode h1 {
 }
 
 body.dark-mode select {
-    background-color: #2a2a2a; /* Dark background */
-    color: #ffffff; /* Light text for readability */
-    border: 1px solid #444; /* Subtle border for clarity */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Optional shadow for a modern look */
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border: 1px solid #444;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode select {
@@ -101,67 +91,65 @@ body.dark-mode select {
 }
 
 body.dark-mode select:focus {
-    border-color: #666; /* Highlight border on focus */
-    outline: none; /* Remove default outline */
-    box-shadow: 0 0 5px #666; /* Add glow effect on focus */
+    border-color: #666;
+    outline: none;
+    box-shadow: 0 0 5px #666;
 }
 
-/* Dark Mode Styles for Dropdown Options */
 body.dark-mode option {
-    background-color: #2a2a2a; /* Match dropdown background */
-    color: #ffffff; /* Ensure text is visible */
+    background-color: #2a2a2a;
+    color: #ffffff;
 }
 
-/* Dark Mode Styles for Date Pickers */
 body.dark-mode input[type="date"] {
-    background-color: #2a2a2a; /* Dark background for the date picker */
-    color: #ffffff; /* Light text for readability */
-    border: 1px solid #444; /* Subtle border for clarity */
-    padding: 5px; /* Add padding for better spacing */
-    border-radius: 5px; /* Rounded corners for modern design */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Optional shadow for a modern look */
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border: 1px solid #444;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode input[type="date"]::placeholder {
-    color: #aaaaaa; /* Subtle placeholder color */
+    color: #aaaaaa;
 }
 
 body.dark-mode input[type="date"]:focus {
-    border-color: #666; /* Highlight border on focus */
-    outline: none; /* Remove default outline */
-    box-shadow: 0 0 5px #666; /* Add glow effect on focus */
+    border-color: #666;
+    outline: none;
+    box-shadow: 0 0 5px #666;
 }
 
 body.dark-mode input[type="date"] {
-    -webkit-appearance: none; /* Safari */
-    -moz-appearance: none;    /* Firefox */
-    appearance: none;         /* Standard */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-body.dark-mode input[type="date"] {
+input[type="text"] {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5rem;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-/* Dark Mode Styles for Input Fields */
 body.dark-mode input[type="text"] {
-    background-color: #2a2a2a; /* Dark background for input fields */
-    color: #ffffff; /* Light text for readability */
-    border: 1px solid #444; /* Subtle border for contrast */
-    border-radius: 5px; /* Rounded corners for modern design */
-    padding: 0.5rem; /* Padding for better usability */
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 0.5rem;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-/* Input field focus styles */
 body.dark-mode input[type="text"]:focus {
-    border-color: #666; /* Highlight border on focus */
-    outline: none; /* Remove default outline */
-    box-shadow: 0 0 5px #666; /* Glow effect on focus */
+    border-color: #666;
+    outline: none;
+    box-shadow: 0 0 5px #666;
 }
 
-/* Placeholder text color in dark mode */
 body.dark-mode input[type="text"]::placeholder {
-    color: #aaaaaa; /* Subtle color for placeholders */
+    color: #aaaaaa;
 }
 
 .flatpickr-calendar.dark {
@@ -183,10 +171,9 @@ body.dark-mode input[type="text"]::placeholder {
     color: #fff;
 }
 
-/* Apply dark mode styling to Flatpickr input */
 body.dark-mode .dark-input {
-    background-color: #2a2a2a; /* Match dark mode background */
-    color: #ffffff; /* Light text */
+    background-color: #2a2a2a;
+    color: #ffffff;
     border: 1px solid #444;
 }
 
@@ -198,7 +185,6 @@ body.dark-mode .dark-input:focus {
 body.dark-mode .dark-input::placeholder {
     color: #aaaaaa;
 }
-
 
 /* Forms */
 form.dark-mode input,
@@ -216,12 +202,10 @@ form.dark-mode button:focus {
     outline: none;
 }
 
-/* Labels */
 form.dark-mode label {
     color: #e0e0e0;
 }
 
-/* Links */
 a.dark-mode {
     color: #90caf9;
 }
@@ -230,35 +214,25 @@ a.dark-mode:hover {
     color: #42a5f5;
 }
 
-/* Contrast for progress container */
-.progress-messages.dark-mode {
-    background-color: #222;
-    border-color: #444;
-    color: #f0f0f0;
-}
-
-/* Progress Container */
 .progress-messages {
     margin-top: 20px;
     padding: 15px;
     max-height: 200px;
     overflow-y: auto;
     border-radius: 5px;
-    background-color: #f9f9f9; /* Light mode background */
-    color: #333; /* Light mode text color */
-    border: 1px solid #ddd; /* Light mode border */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #f3f3f3; /* Softer background for light mode */
+    color: #222; /* Darker text for better contrast */
+    border: 1px solid #ccc; /* Softer border color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Progress Messages in Dark Mode */
 body.dark-mode .progress-messages {
-    background-color: #2a2a2a; /* Dark mode background */
-    color: #ffffff; /* Dark mode text color */
-    border: 1px solid #444; /* Dark mode border */
-    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1); /* Subtle shadow for dark mode */
+    background-color: #1e1e1e; /* Darker background for dark mode */
+    color: #f0f0f0; /* Light text for readability */
+    border: 1px solid #555;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
 }
 
-/* List Items in Progress Messages */
 .progress-messages ul {
     list-style-type: none;
     padding: 0;
@@ -269,25 +243,23 @@ body.dark-mode .progress-messages {
     padding: 8px 10px;
     margin-bottom: 5px;
     border-radius: 3px;
-    background-color: #ffffff; /* Light mode item background */
-    color: #333; /* Light mode item text */
+    background-color: #ffffff;
+    color: #222;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Mode for List Items */
 body.dark-mode .progress-messages ul li {
-    background-color: #3a3a3a; /* Dark mode item background */
-    color: #e0e0e0; /* Dark mode item text */
+    background-color: #2a2a2a;
+    color: #e0e0e0;
     box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
-/* Improved Contrast for Hover State */
 .progress-messages ul li:hover {
-    background-color: #f1f1f1; /* Light mode hover */
-    color: #000; /* Light mode hover text */
+    background-color: #ebebeb;
+    color: #000;
 }
 
 body.dark-mode .progress-messages ul li:hover {
-    background-color: #444; /* Dark mode hover */
-    color: #fff; /* Dark mode hover text */
+    background-color: #3a3a3a;
+    color: #fff;
 }
