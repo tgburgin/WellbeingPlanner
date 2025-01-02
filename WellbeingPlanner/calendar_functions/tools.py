@@ -51,23 +51,15 @@ def get_fitness_test_choices():
     return [
         {"id": 1, "name": "1-Mile Run", "details": "Run or walk 1 mile as fast as you can."},
         {"id": 2, "name": "5K Run", "details": "Run or walk 5 kilometers as fast as you can."},
-        {"id": 3, "name": "10K Run", "details": "Run or walk 10 kilometers as fast as you can."},
-        {"id": 4, "name": "None", "details": "No fitness test selected."}
+        {"id": 3, "name": "10K Run", "details": "Run or walk 10 kilometers as fast as you can."}
     ]
 
-def process_fitness_test_choice(choice_id):
-    # Map choice ID to a fitness test
-    fitness_tests = {
-        1: {"name": "Baseline Cardio Fitness Test: 1-Mile Run", "time": "09:30", "duration": 20, "details": "Run or walk 1 mile as fast as you can."},
-        2: {"name": "Baseline Cardio Fitness Test: 5K Run", "time": "09:30", "duration": 30, "details": "Run or walk 5 kilometers as fast as you can."},
-        3: {"name": "Baseline Cardio Fitness Test: 10K Run", "time": "09:30", "duration": 60, "details": "Run or walk 10 kilometers as fast as you can."},
-        4: None  # No test selected
-    }
-    return fitness_tests.get(choice_id, None)
-
-def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, weekly_activities, cardio_workouts, fitness_test_choice=None):
+def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, weekly_activities, cardio_workouts, fitness_test_choice=None, include_fitness_test=True):
     fitness_test_choice = fitness_test_choice or 1  # Default to 1-Mile Run if not set
     fitness_test = None
+
+    if not include_fitness_test:
+        fitness_test_choice = 4  # Corresponds to "None" in fitness tests
 
     # Map fitness test choice to its details
     if fitness_test_choice == 1:
@@ -160,71 +152,6 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
                 calendar_service.events().insert(calendarId=calendar_id, body=event).execute()
 
             event_date += timedelta(weeks=1)
-
-def get_starting_weekday():
-    # Print options
-    print("Choose the day of the week to start the plan:")
-    print("1. Monday")
-    print("2. Tuesday")
-    print("3. Wednesday")
-    print("4. Thursday")
-    print("5. Friday")
-    print("6. Saturday")
-    print("7. Sunday")
-    
-    # Get user choice
-    choice = input("Enter the number corresponding to your choice: ")
-
-    # Validate choice
-    if choice not in ["1", "2", "3", "4", "5", "6", "7"]:
-        print("Invalid choice. Please enter a number between 1 and 7.")
-        # Recursively call the function until a valid choice is made
-        return get_starting_weekday()
-
-    # Return choice
-    return int(choice) - 1
-
-def get_date_range():
-    # Get current date
-    now = datetime.now()
-
-    # Print options
-    print("Choose a time frame:")
-    print("1. 1 Week")
-    print("2. 2 Weeks")
-    print("3. 4 Weeks")
-    print("4. 1 Month (starting from the 1st)")
-    
-    # Get user choice
-    choice = input("Enter the number corresponding to your choice: ")
-
-    # Validate choice
-    if choice not in ["1", "2", "3", "4"]:
-        print("Invalid choice. Please enter 1, 2, 3, or 4.")
-        # Recursively call the function until a valid choice is made
-        return get_date_range()
-
-    # Calculate start date based on choice
-    if choice in ["1", "2", "3"]:
-        day_choice = get_starting_weekday()
-        days_difference = (int(day_choice) - now.weekday()) % 7
-        start_date = datetime(now.year, now.month, now.day) + timedelta(days=days_difference)
-
-    # Calculate end date based on choice
-    if choice == "1":
-        end_date = start_date + timedelta(days=6)
-    elif choice == "2":
-        end_date = start_date + timedelta(days=13)
-    elif choice == "3":
-        end_date = start_date + timedelta(days=27)
-    elif choice == "4":
-        next_month = now.month + 1 if now.month < 12 else 1
-        year = now.year if next_month > 1 else now.year + 1
-        start_date = datetime(year, next_month, 1)
-        end_date = datetime(year, next_month, monthrange(year, next_month)[1])
-
-    # Return start and end dates
-    return start_date, end_date
 
 def add_reminder(calendar_service, calendar_id, end_date):
     # Remove any old reminders first

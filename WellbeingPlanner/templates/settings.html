@@ -13,9 +13,15 @@
     <div class="container">
         <h1>Settings</h1>
         <form class="{{ 'dark-mode' if dark_mode else '' }}" method="POST" action="{{ url_for('settings') }}">
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="include_fitness_test" name="include_fitness_test" 
+                       {% if include_fitness_test %}checked{% endif %} onchange="toggleFitnessTestDropdown()">
+                <label class="form-check-label" for="include_fitness_test">Include Monthly Fitness Test</label>
+            </div>
             <div class="mb-3">
                 <label for="fitness_test_choice" class="form-label">Default Fitness Test</label>
-                <select id="fitness_test_choice" name="fitness_test_choice" class="form-select">
+                <select id="fitness_test_choice" name="fitness_test_choice" class="form-select" 
+                        {% if not include_fitness_test %}disabled{% endif %}>
                     {% for test in fitness_tests %}
                     <option value="{{ test.id }}" {% if test.id == fitness_test_choice %}selected{% endif %}>
                         {{ test.name }}
@@ -23,6 +29,14 @@
                     {% endfor %}
                 </select>
             </div>
+            <script>
+                function toggleFitnessTestDropdown() {
+                    const checkbox = document.getElementById('include_fitness_test');
+                    const dropdown = document.getElementById('fitness_test_choice');
+                    dropdown.disabled = !checkbox.checked;
+                }
+                document.addEventListener('DOMContentLoaded', toggleFitnessTestDropdown);
+            </script>            
             <div class="mb-3">
                 <label for="calendar_color" class="form-label">Calendar Color</label>
                 <div class="d-flex flex-wrap" id="colorPalette">

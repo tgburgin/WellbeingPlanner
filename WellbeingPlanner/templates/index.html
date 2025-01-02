@@ -117,11 +117,14 @@
             };
         
             // Handle errors
-            eventSource.onerror = () => {
+            eventSource.onerror = (event) => {
                 eventSource.close();
+                const errorMessage = event.data || "An unknown error occurred. Please check the console for more details.";
                 const li = document.createElement('li');
-                li.textContent = "An error occurred. Please try again.";
+                li.textContent = errorMessage;
                 progressList.appendChild(li);
+            
+                console.error("Error in EventSource:", event);
             };
         });        
     </script>
