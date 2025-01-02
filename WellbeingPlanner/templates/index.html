@@ -48,32 +48,35 @@
     </div>
     <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
-        
-            flatpickr('#start_date', {
-                dateFormat: 'Y-m-d',
-                theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
-                minDate: today, // Prevent dates before today
-                onChange: (selectedDates) => {
-                    // Dynamically adjust the minDate for end_date
-                    const minEndDate = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : today;
-                    document.getElementById('end_date')._flatpickr.set('minDate', minEndDate);
-                },
-                onReady: (selectedDates, dateStr, instance) => {
-                    instance.input.classList.add('dark-input');
-                },
-            });
-        
-            flatpickr('#end_date', {
-                dateFormat: 'Y-m-d',
-                theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
-                minDate: today, // Prevent dates before today
-                onReady: (selectedDates, dateStr, instance) => {
-                    instance.input.classList.add('dark-input');
-                },
-            });        
-
+        document.addEventListener('DOMContentLoaded', () => {     
+            
+            function initializeFlatpickr() {
+                const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
+            
+                flatpickr('#start_date', {
+                    dateFormat: 'Y-m-d',
+                    theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+                    minDate: today, // Prevent dates before today
+                    locale: {
+                        firstDayOfWeek: 1 // Monday as the first day of the week
+                    },
+                    onChange: (selectedDates) => {
+                        // Dynamically adjust the minDate for end_date
+                        const minEndDate = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : today;
+                        document.getElementById('end_date')._flatpickr.set('minDate', minEndDate);
+                    },
+                });
+            
+                flatpickr('#end_date', {
+                    dateFormat: 'Y-m-d',
+                    theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+                    minDate: today, // Prevent dates before today
+                    locale: {
+                        firstDayOfWeek: 1 // Monday as the first day of the week
+                    },
+                });
+            }
+            
             initializeFlatpickr();
 
             // Toggle dark mode

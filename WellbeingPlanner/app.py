@@ -105,7 +105,11 @@ def progress():
                 error_message=str(e)
         )
 
-    return Response(generate(), mimetype='text/event-stream')
+    return Response(generate(), mimetype='text/event-stream', headers={
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive"
+    })
+
 
 if __name__ == '__main__':
     app.run(debug=True)
