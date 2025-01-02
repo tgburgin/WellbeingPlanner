@@ -15,25 +15,23 @@ def index():
 def settings():
     calendar_service = initialize_calendar_service()
     calendar_id = get_or_create_calendar(calendar_service)
+    calendar_list_entry = calendar_service.calendarList().get(calendarId=calendar_id).execute()
 
     if request.method == 'POST':
         session['fitness_test_choice'] = int(request.form.get('fitness_test_choice', 1))
         session['dark_mode'] = 'dark_mode' in request.form
         session['calendar_color'] = request.form.get('calendar_color', '1')
 
-        print(f"Updating calendar color to {session['calendar_color']}")
-
-        calendar_list_entry = calendar_service.calendarList().get(calendarId=calendar_id).execute()
-        calendar_list_entry['colorId'] = session['calendar_color']
-        calendar_service.calendarList().update(calendarId=calendar_list_entry['id'], body=calendar_list_entry).execute()
+        if calendar_list_entry.get('colorId') != session['calendar_color']:
+            calendar_list_entry['colorId'] = session['calendar_color']
+            calendar_service.calendarList().update(calendarId=calendar_list_entry['id'], body=calendar_list_entry).execute()
                 
         return redirect(url_for('index'))
 
     fitness_test_choice = session.get('fitness_test_choice', 1)
     dark_mode = session.get('dark_mode', False)
 
-    calendar = calendar_service.calendars().get(calendarId=calendar_id).execute()
-    current_color = calendar.get('colorId', '1')
+    current_color = calendar_list_entry.get('colorId', '1')
 
     colors = calendar_service.colors().get().execute()
     calendar_colors = {

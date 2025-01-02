@@ -43,23 +43,22 @@
     <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const colorPalette = document.getElementById('colorPalette');
+            const selectedSwatch = document.querySelector('.color-swatch.selected');
             const hiddenInput = document.getElementById('calendar_color');
     
-            colorPalette.addEventListener('click', (event) => {
-                const selectedSwatch = event.target.closest('.color-swatch');
-                if (selectedSwatch) {
-                    // Remove the 'selected' class from all swatches
-                    document.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('selected'));
-                    
-                    // Add the 'selected' class to the clicked swatch
-                    selectedSwatch.classList.add('selected');
-                    
-                    // Update the hidden input value
-                    hiddenInput.value = selectedSwatch.getAttribute('data-value');
+            if (selectedSwatch) {
+                hiddenInput.value = selectedSwatch.getAttribute('data-value'); // Set initial value
+            }
+    
+            document.getElementById('colorPalette').addEventListener('click', (event) => {
+                const swatch = event.target.closest('.color-swatch');
+                if (swatch) {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                    hiddenInput.value = swatch.getAttribute('data-value'); // Update value
                 }
             });
         });
-    </script>    
+    </script>
 </body>
 </html>
