@@ -18,7 +18,8 @@ The **Wellbeing Planner** is a comprehensive tool designed to help you create cu
 
 ## Screenshots
 
-![Wellbeing Planner UI](assets/screenshot.png)
+![Wellbeing Planner UI](assets/main.png)
+![Wellbeing Planner Settings UI](assets/settings.png)
 
 ---
 
