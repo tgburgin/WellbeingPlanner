@@ -46,9 +46,15 @@ The **Wellbeing Planner** is a comprehensive tool designed to help you create cu
    ```
 
 3. Set up your environment variables for Google OAuth:
-   - `GOOGLE_CLIENT_ID`
-   - `GOOGLE_CLIENT_SECRET`
-   - `GOOGLE_PROJECT_ID`
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Create a new project or select an existing one.
+   - Navigate to **APIs & Services** > **Credentials**.
+   - Click on **Create Credentials** and choose **OAuth 2.0 Client ID**.
+   - Configure the consent screen and add the necessary redirect URIs (e.g., `http://localhost`).
+   - Save the `Client ID` and `Client Secret`, and set the following environment variables:
+     - `GOOGLE_CLIENT_ID`
+     - `GOOGLE_CLIENT_SECRET`
+     - `GOOGLE_PROJECT_ID`
 
 4. Run the app:
    ```bash
