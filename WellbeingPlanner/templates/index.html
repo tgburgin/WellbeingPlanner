@@ -33,6 +33,10 @@
                 <label for="end_date" class="form-label">End Date</label>
                 <input type="text" id="end_date" name="end_date" class="form-control" required>
             </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="clear_old" name="clear_old" class="form-check-input">
+                <label for="clear_old" class="form-check-label">Clear events prior to now</label>
+            </div>            
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">Create Plan</button>
             </div>
@@ -88,6 +92,7 @@
         
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
+            const clearOld = document.getElementById('clear_old').checked;
         
             if (!startDate || !endDate) {
                 alert("Please select valid start and end dates.");
@@ -101,7 +106,7 @@
             progressList.innerHTML = ''; // Clear previous progress
         
             // Open an EventSource connection to /progress
-            const eventSource = new EventSource(`/progress?start_date=${startDate}&end_date=${endDate}`);
+            const eventSource = new EventSource(`/progress?start_date=${startDate}&end_date=${endDate}&clear_old=${clearOld}`);
         
             // Handle incoming messages
             eventSource.onmessage = (event) => {
@@ -120,5 +125,6 @@
             };
         });        
     </script>
+    
 </body>
 </html>

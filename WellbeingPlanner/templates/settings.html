@@ -23,9 +23,43 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="mb-3">
+                <label for="calendar_color" class="form-label">Calendar Color</label>
+                <div class="d-flex flex-wrap" id="colorPalette">
+                    {% for color_id, color_info in calendar_colors.items() %}
+                    <div class="color-swatch m-1 {% if color_id == calendar_color %}selected{% endif %}" 
+                        data-value="{{ color_id }}" 
+                        style="background-color: {{ color_info['background'] }};"
+                        title="{{ color_info['name'] }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" id="calendar_color" name="calendar_color" value="{{ calendar_color }}">
+                <small>Choose a color for your Google Calendar.</small>
+            </div>                                                                                                            
             <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>
     </div>
     <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const colorPalette = document.getElementById('colorPalette');
+            const hiddenInput = document.getElementById('calendar_color');
+    
+            colorPalette.addEventListener('click', (event) => {
+                const selectedSwatch = event.target.closest('.color-swatch');
+                if (selectedSwatch) {
+                    // Remove the 'selected' class from all swatches
+                    document.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('selected'));
+                    
+                    // Add the 'selected' class to the clicked swatch
+                    selectedSwatch.classList.add('selected');
+                    
+                    // Update the hidden input value
+                    hiddenInput.value = selectedSwatch.getAttribute('data-value');
+                }
+            });
+        });
+    </script>    
 </body>
 </html>

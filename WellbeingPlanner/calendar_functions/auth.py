@@ -58,3 +58,6 @@ def get_or_create_calendar(service):
     created_calendar = service.calendars().insert(body=new_calendar).execute()
     print(f"Created new calendar: {calendar_name} (ID: {created_calendar['id']})")
     return created_calendar['id']
+
+def get_calendar_colors(service):
+    return service.colors().get().execute().get('calendar', {})
