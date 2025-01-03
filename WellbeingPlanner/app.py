@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, Response
 from datetime import datetime
+from config.settings import CARDIO_WORKOUTS
 from main import wellbeing_planner
 from calendar_functions.tools import clear_calendar_events, get_fitness_test_choices
 from calendar_functions.auth import initialize_calendar_service, get_or_create_calendar
@@ -17,6 +18,7 @@ def settings():
     fitness_test_choice = 1  # Default value
     dark_mode = False  # Default value
     current_color = '1'  # Default calendar color
+    selected_workouts = []
 
     try:
         calendar_service = initialize_calendar_service()
@@ -28,6 +30,10 @@ def settings():
             session['fitness_test_choice'] = int(request.form.get('fitness_test_choice', 1))
             session['dark_mode'] = 'dark_mode' in request.form
             session['calendar_color'] = request.form.get('calendar_color', '1')
+            enabled_types = request.form.getlist('cardio_types')
+            enabled_workouts = request.form.getlist('cardio_workouts')
+            session['enabled_types'] = enabled_types
+            session['enabled_workouts'] = enabled_workouts
 
             if calendar_list_entry.get('colorId') != session['calendar_color']:
                 calendar_list_entry['colorId'] = session['calendar_color']
@@ -40,6 +46,20 @@ def settings():
         fitness_test_choice = session.get('fitness_test_choice', 1)
         dark_mode = session.get('dark_mode', False)
         current_color = calendar_list_entry.get('colorId', '1')
+        cardio_workouts = [
+            {
+                "type": category["type"],
+                "enabled": category["type"] in session.get('enabled_types', [cat["type"] for cat in CARDIO_WORKOUTS]),
+                "workouts": [
+                    {
+                        "name": workout["name"],
+                        "enabled": workout["name"] in session.get('enabled_workouts', [work["name"] for work in category["workouts"]]),
+                    }
+                    for workout in category["workouts"]
+                ]
+            }
+            for category in CARDIO_WORKOUTS
+        ]
 
         colors = calendar_service.colors().get().execute()
         calendar_colors = {
@@ -65,7 +85,8 @@ def settings():
         fitness_test_choice=fitness_test_choice,
         dark_mode=dark_mode,
         calendar_color=current_color,
-        calendar_colors=calendar_colors
+        calendar_colors=calendar_colors,
+        cardio_workouts=cardio_workouts
     )
 
 
@@ -85,6 +106,8 @@ def progress():
 
     fitness_test_choice = session.get('fitness_test_choice', 1)
     include_fitness_test = session.get('include_fitness_test', True)
+    enabled_types = session.get('enabled_types', [])
+    enabled_workouts = session.get('enabled_workouts', [])
 
     def generate():
         try:
@@ -95,7 +118,7 @@ def progress():
                 clear_calendar_events(calendar_service, calendar_id, datetime.min, current_date)
 
             yield "data: Starting wellbeing plan creation...\n\n"
-            for message in wellbeing_planner(start_date, end_date, fitness_test_choice, include_fitness_test):
+            for message in wellbeing_planner(start_date, end_date, enabled_types, enabled_workouts, fitness_test_choice, include_fitness_test):
                 yield f"data: {message}\n\n"
             yield "data: Wellbeing plan creation complete!\n\n"
         except Exception as e:

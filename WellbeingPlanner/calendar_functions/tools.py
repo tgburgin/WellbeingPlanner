@@ -54,7 +54,7 @@ def get_fitness_test_choices():
         {"id": 3, "name": "10K Run", "details": "Run or walk 10 kilometers as fast as you can."}
     ]
 
-def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, weekly_activities, cardio_workouts, fitness_test_choice=None, include_fitness_test=True):
+def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, weekly_activities, cardio_workouts, enabled_types, enabled_workouts, fitness_test_choice=None, include_fitness_test=True):
     fitness_test_choice = fitness_test_choice or 1  # Default to 1-Mile Run if not set
     fitness_test = None
 
@@ -84,6 +84,16 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
             "details": "Run or walk 10 kilometers as fast as you can."
         }
 
+    filtered_cardio_workouts = [
+            {
+                "type": category["type"],
+                "workouts": [
+                    workout for workout in category["workouts"] if workout["name"] in enabled_workouts
+                ]
+            }
+            for category in cardio_workouts if category["type"] in enabled_types
+        ]
+
     first_monday_offset = (7 - start_date.weekday()) % 7
     first_monday = start_date + timedelta(days=first_monday_offset)
 
@@ -95,9 +105,9 @@ def add_weekly_activities(calendar_service, calendar_id, start_date, end_date, w
                 event_date += timedelta(weeks=1)
                 continue
 
-            if activity['name'].startswith("Cardio"):
+            if activity['name'].startswith("Cardio") and filtered_cardio_workouts:
                 # Choose a random workout
-                workout_category = random.choice(cardio_workouts)
+                workout_category = random.choice(filtered_cardio_workouts)
                 workout = random.choice(workout_category['workouts'])
                 activity_name = f"{activity['name']}: {workout['name']} ({workout_category['type']})"
                 activity_description = f"{workout['details']}\n{activity['details']}"

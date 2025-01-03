@@ -10,7 +10,7 @@ weekly_activities = WEEKLY_ACTIVITIES
 
 
 # Main script
-def wellbeing_planner(start_date, end_date, fitness_test_choice=1, include_fitness_test=True):
+def wellbeing_planner(start_date, end_date, enabled_types=[], enabled_workouts=[], fitness_test_choice=1, include_fitness_test=True):
     try:
         yield "Initializing calendar service..."
         calendar_service = initialize_calendar_service()
@@ -25,7 +25,7 @@ def wellbeing_planner(start_date, end_date, fitness_test_choice=1, include_fitne
         add_daily_activities(calendar_service, calendar_id, start_date, end_date, DAILY_ACTIVITIES)
 
         yield "Adding weekly activities..."
-        add_weekly_activities(calendar_service, calendar_id, start_date, end_date, WEEKLY_ACTIVITIES, CARDIO_WORKOUTS, fitness_test_choice, include_fitness_test)
+        add_weekly_activities(calendar_service, calendar_id, start_date, end_date, WEEKLY_ACTIVITIES, CARDIO_WORKOUTS, enabled_types, enabled_workouts, fitness_test_choice, include_fitness_test)
 
         yield "Adding reminder for future planning..."
         add_reminder(calendar_service, calendar_id, end_date)

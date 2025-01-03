@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,63 +8,161 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
+
 <body class="{{ 'dark-mode' if dark_mode else '' }}">
-    <div class="container">
-        <h1>Settings</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Settings</h1>
         <form class="{{ 'dark-mode' if dark_mode else '' }}" method="POST" action="{{ url_for('settings') }}">
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="include_fitness_test" name="include_fitness_test" 
-                       {% if include_fitness_test %}checked{% endif %} onchange="toggleFitnessTestDropdown()">
-                <label class="form-check-label" for="include_fitness_test">Include Monthly Fitness Test</label>
-            </div>
-            <div class="mb-3">
-                <label for="fitness_test_choice" class="form-label">Default Fitness Test</label>
-                <select id="fitness_test_choice" name="fitness_test_choice" class="form-select" 
-                        {% if not include_fitness_test %}disabled{% endif %}>
-                    {% for test in fitness_tests %}
-                    <option value="{{ test.id }}" {% if test.id == fitness_test_choice %}selected{% endif %}>
-                        {{ test.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <script>
-                function toggleFitnessTestDropdown() {
-                    const checkbox = document.getElementById('include_fitness_test');
-                    const dropdown = document.getElementById('fitness_test_choice');
-                    dropdown.disabled = !checkbox.checked;
-                }
-                document.addEventListener('DOMContentLoaded', toggleFitnessTestDropdown);
-            </script>            
-            <div class="mb-3">
-                <label for="calendar_color" class="form-label">Calendar Color</label>
-                <div class="d-flex flex-wrap" id="colorPalette">
-                    {% for color_id, color_info in calendar_colors.items() %}
-                    <div class="color-swatch m-1 {% if color_id == calendar_color %}selected{% endif %}" 
-                        data-value="{{ color_id }}" 
-                        style="background-color: {{ color_info['background'] }};"
-                        title="{{ color_info['name'] }}">
+            <div class="accordion mb-3" id="settingsAccordion">
+
+                <!-- Calendar Color -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="calendarColorHeading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#calendarColor" aria-expanded="false" aria-controls="calendarColor">
+                            Calendar Color
+                        </button>
+                    </h2>
+                    <div id="calendarColor" class="accordion-collapse collapse" aria-labelledby="calendarColorHeading" data-bs-parent="#settingsAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                <div class="d-flex flex-wrap" id="colorPalette">
+                                    {% for color_id, color_info in calendar_colors.items() %}
+                                    <div class="color-swatch m-1 {% if color_id == calendar_color %}selected{% endif %}" data-value="{{ color_id }}" style="background-color: {{ color_info['background'] }};" title="{{ color_info['name'] }}"></div>
+                                    {% endfor %}
+                                </div>
+                                <input type="hidden" id="calendar_color" name="calendar_color" value="{{ calendar_color }}">
+                                <small>Choose a color for your Google Calendar.</small>
+                            </div>
+                        </div>
                     </div>
-                    {% endfor %}
                 </div>
-                <input type="hidden" id="calendar_color" name="calendar_color" value="{{ calendar_color }}">
-                <small>Choose a color for your Google Calendar.</small>
-            </div>                                                                                                            
+
+                <!-- Cardio Workouts -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="cardioWorkoutsHeading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cardioWorkouts" aria-expanded="false" aria-controls="cardioWorkouts">
+                            Cardio Workouts
+                        </button>
+                    </h2>
+                    <div id="cardioWorkouts" class="accordion-collapse collapse" aria-labelledby="cardioWorkoutsHeading" data-bs-parent="#settingsAccordion">
+                        <div class="accordion-body">
+                            {% for category in cardio_workouts %}
+                            <div class="mb-2">
+                                <strong>{{ category.type }}</strong>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="type_{{ category.type|replace(' ', '_') }}" name="cardio_types" value="{{ category.type }}" {% if category.enabled %}checked{% endif %} onchange="toggleCategoryWorkouts('{{ category.type|replace(' ', '_') }}')">
+                                    <label class="form-check-label" for="type_{{ category.type|replace(' ', '_') }}">Enable all {{ category.type }} workouts</label>
+                                </div>
+                                <div id="{{ category.type|replace(' ', '_') }}_workouts" style="margin-left: 20px;">
+                                    {% for workout in category.workouts %}
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="workout_{{ category.type|replace(' ', '_') }}_{{ loop.index }}" name="cardio_workouts" value="{{ workout.name }}" {% if workout.enabled %}checked{% endif %}>
+                                        <label class="form-check-label" for="workout_{{ category.type|replace(' ', '_') }}_{{ loop.index }}">{{ workout.name }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fitness Test -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="fitnessTestHeading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#fitnessTest" aria-expanded="true" aria-controls="fitnessTest">
+                            Fitness Test
+                        </button>
+                    </h2>
+                    <div id="fitnessTest" class="accordion-collapse collapse show" aria-labelledby="fitnessTestHeading" data-bs-parent="#settingsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="include_fitness_test" name="include_fitness_test" {% if include_fitness_test %}checked{% endif %} onchange="toggleFitnessTestDropdown()">
+                                <label class="form-check-label" for="include_fitness_test">Include Monthly Fitness Test</label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fitness_test_choice" class="form-label">Default Fitness Test</label>
+                                <select id="fitness_test_choice" name="fitness_test_choice" class="form-select" {% if not include_fitness_test %}disabled{% endif %}>
+                                    {% for test in fitness_tests %}
+                                    <option value="{{ test.id }}" {% if test.id == fitness_test_choice %}selected{% endif %}>
+                                        {{ test.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>
     </div>
+
+    <script>
+        function toggleFitnessTestDropdown() {
+            const checkbox = document.getElementById('include_fitness_test');
+            const dropdown = document.getElementById('fitness_test_choice');
+            dropdown.disabled = !checkbox.checked;
+        }
+        
+        // Ensure the function is attached and executed
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleFitnessTestDropdown();
+            const checkbox = document.getElementById('include_fitness_test');
+            checkbox.addEventListener('change', toggleFitnessTestDropdown);
+        });
+        
+        function toggleCategoryWorkouts(category) {
+            const categoryCheckbox = document.querySelector(`#type_${category.replace(/\s+/g, '_')}`);
+            const workoutCheckboxes = document.querySelectorAll(`#${category}_workouts input[type="checkbox"]`);
+            const isChecked = categoryCheckbox.checked;
+        
+            // Safeguard: Ensure the selectors are valid
+            if (!categoryCheckbox || workoutCheckboxes.length === 0) return;
+        
+            workoutCheckboxes.forEach(cb => cb.checked = isChecked);
+        }
+        
+        function updateEnableAllCheckbox(category) {
+            const categoryCheckbox = document.querySelector(`#type_${category.replace(/\s+/g, '_')}`);
+            const workoutCheckboxes = document.querySelectorAll(`#${category}_workouts input[type="checkbox"]`);
+        
+            // Safeguard: Ensure the selectors are valid
+            if (!categoryCheckbox || workoutCheckboxes.length === 0) return;
+        
+            const allSelected = Array.from(workoutCheckboxes).every(cb => cb.checked);
+            const anySelected = Array.from(workoutCheckboxes).some(cb => cb.checked);
+        
+            categoryCheckbox.checked = allSelected;
+            categoryCheckbox.indeterminate = !allSelected && anySelected;
+        }
+        
+        // Attach event listeners for individual checkboxes
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                if (checkbox.id.startsWith('workout_')) {
+                    checkbox.addEventListener('change', () => {
+                        const category = checkbox.closest('div[id$="_workouts"]').id.replace('_workouts', '');
+                        updateEnableAllCheckbox(category);
+                    });
+                }
+            });
+        });
+                    
+    </script>
     <script src="{{ url_for('static', filename='js/dark_mode.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const selectedSwatch = document.querySelector('.color-swatch.selected');
             const hiddenInput = document.getElementById('calendar_color');
-    
+
             if (selectedSwatch) {
                 hiddenInput.value = selectedSwatch.getAttribute('data-value'); // Set initial value
             }
-    
+
             document.getElementById('colorPalette').addEventListener('click', (event) => {
                 const swatch = event.target.closest('.color-swatch');
                 if (swatch) {
@@ -75,4 +174,5 @@
         });
     </script>
 </body>
+
 </html>
